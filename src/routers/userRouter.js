@@ -15,7 +15,7 @@ userRouter.post('/users', async (req, res) => {
         let token = await user.generateAuthToken();
         res.status(201).send({ user, token });
     } catch (e) {
-        res.status(400).send();
+        res.status(400).send(e);
     }
 });
 
@@ -26,6 +26,18 @@ userRouter.post('/users/login', async (req, res) => {
         res.send({ user, token });
     } catch (e) {
         res.status(401).send('Invalid Credentials')
+    }
+});
+
+userRouter.patch('/users/logout',auth,async(req,res)=>{
+    try{
+    req.user.tokens=req.user.tokens.filter((token)=>{
+        return token != req.token;
+    })
+    req.user.save();
+    res.send();
+    }catch(e){
+        res.status(401).send();
     }
 })
 

@@ -34,7 +34,7 @@ userRouter.patch('/users/logout',auth,async(req,res)=>{
     req.user.tokens=req.user.tokens.filter((token)=>{
         return token.token !== req.token;
     })
-    req.user.save();
+    await req.user.save();
     res.send();
     }catch(e){
         res.status(401).send();
@@ -44,7 +44,7 @@ userRouter.patch('/users/logout',auth,async(req,res)=>{
 userRouter.patch('/users/logoutall',auth,async(req,res)=>{
     try{
     req.user.tokens=undefined;
-    req.user.save();
+    await req.user.save();
     res.send();
     }catch(e){
       res.status(500).send();

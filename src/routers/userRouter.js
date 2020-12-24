@@ -5,9 +5,6 @@ import { User } from '../models/user.js';
 
 export const userRouter = express.Router();
 
-var led = true;
-
-
 userRouter.post('/users', async (req, res) => {
     try {
         const user = new User(req.body);
@@ -74,9 +71,5 @@ userRouter.patch('/bulb', auth, async (req, res) => {
 userRouter.get('/bulb',async (req, res) => {
     const user = await User.findById(req.query.userId);
     res.set('Content-Type', 'text/plain');// set the headers 
-    if (user.devices.bulb) {
-        res.send({ value: 1 });// if led is on or true, send value=1    
-    } else {
-        res.send({ value: 0 });//else send value = 0    
-    }
+        res.send({ bulbStatus: user.devices.bulb });// if led is on or true, send bulbStatus=true
 });

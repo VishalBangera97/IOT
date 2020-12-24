@@ -39,6 +39,16 @@ userRouter.patch('/users/logout',auth,async(req,res)=>{
     }catch(e){
         res.status(401).send();
     }
+});
+
+userRouter.patch('/users/logoutall',auth,async(req,res)=>{
+    try{
+    req.user.tokens=undefined;
+    req.user.save();
+    res.send();
+    }catch(e){
+      res.status(500).send();
+    }
 })
 
 userRouter.patch('/bulb', auth, async (req, res) => {

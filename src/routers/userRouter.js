@@ -71,11 +71,10 @@ userRouter.patch('/bulb', auth, async (req, res) => {
 
 
 
-userRouter.get('/bulb', auth, async (req, res) => {
-    const User = req.user;
-    console.log(User.devices.bulb);// log the value of led onto console 
+userRouter.get('/bulb',async (req, res) => {
+    const user = await User.findById(req.query.userId);
     res.set('Content-Type', 'text/plain');// set the headers 
-    if (User.devices.bulb) {
+    if (user.devices.bulb) {
         res.send({ value: 1 });// if led is on or true, send value=1    
     } else {
         res.send({ value: 0 });//else send value = 0    

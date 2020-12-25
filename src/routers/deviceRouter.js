@@ -37,15 +37,31 @@ deviceRouter.get('/bulb', async (req, res) => {
     } catch (e) {
         res.status(500).send();
     }
-
-
-    deviceRouter.get('/nodemcu', async (req, res) => {
-        try {
-            let host = req.query.host;
-            let url = "/data?value=1";
-            request(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: close\r\n\r\n");
-        } catch (e) {
-          res.status(501).send(e);
-        }
-    })
 });
+
+deviceRouter.get('/nodemcu', async (req, res) => {
+    try {
+        let host = req.query.host;
+        let url = "/data";
+        console.log('here')
+        res.redirect(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: close\r\n\r\n");
+    } catch (e) {
+        res.status(501).send(e);
+    }
+});
+
+deviceRouter.post('/receivePostData', async (req, res) => {
+    try {
+        res.send(req.body);
+    } catch (e) {
+        res.status(501).send();
+    }
+})
+
+deviceRouter.put('/receivePutData', async (req, res) => {
+    try {
+        res.send(req.query.data);
+    } catch (e) {
+        res.status(501).send();
+    }
+})

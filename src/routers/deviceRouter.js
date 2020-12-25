@@ -54,8 +54,8 @@ let data;
 
 deviceRouter.post('/receivePostData', async (req, res) => {
     try {
-        data = req.body.name;
-        res.send(req.body.name);
+        data = req.body;
+        res.send(req.body);
     } catch (e) {
         res.status(501).send();
     }

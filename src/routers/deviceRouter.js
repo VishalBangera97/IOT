@@ -5,11 +5,10 @@ import { Device } from '../models/device.js';
 
 export const deviceRouter = express.Router();
 
-deviceRouter.post('/devices', auth, async (req, res) => {
+deviceRouter.post('/devices', async (req, res) => {
     try {
         const device = new Device(req.body);
-        device.userId = req.user._id;
-        console.log(device);
+        device.userId = req.query.userId;
         await device.save();
         res.status(201).send();
     } catch (e) {

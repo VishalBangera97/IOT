@@ -44,18 +44,16 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }],
-    devices: {
-        bulb: {
-            type: Boolean
-        },
-        motor: {
-            type: Boolean
-        }
-    }
+    }]
 }, {
     timestamps: true
 });
+
+userSchema.virtual('devices',{
+    ref:'Device',
+    localField:'_id',
+    foreignField:'userId'
+})
 
 userSchema.methods.generateAuthToken = async function () {
     const user = this;

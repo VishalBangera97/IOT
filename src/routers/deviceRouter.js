@@ -50,18 +50,30 @@ deviceRouter.get('/nodemcu', async (req, res) => {
     }
 });
 
+const data;
+
 deviceRouter.post('/receivePostData', async (req, res) => {
     try {
+        data=req.body;
         res.send(req.body);
     } catch (e) {
         res.status(501).send();
     }
-})
+});
 
 deviceRouter.put('/receivePutData', async (req, res) => {
     try {
+        data=req.query.data;
         res.send(req.query.data);
     } catch (e) {
         res.status(501).send();
+    }
+});
+
+deviceRouter.get('/data',async(req,res)=>{
+    try{
+     res.send(data);
+    }catch(e){
+     res.status(500).send();
     }
 })

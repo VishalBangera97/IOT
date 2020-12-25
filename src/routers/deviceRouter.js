@@ -54,8 +54,8 @@ let data;
 
 deviceRouter.post('/receivePostData', async (req, res) => {
     try {
-        data = req.body;
-        res.send(req.body);
+        data = req.body.value;
+        res.send(req.body.value);
     } catch (e) {
         res.status(501).send();
     }
@@ -72,6 +72,7 @@ deviceRouter.put('/receivePutData', async (req, res) => {
 
 deviceRouter.get('/data', async (req, res) => {
     try {
+        console.log(data)
         res.send(data);
     } catch (e) {
         res.status(500).send();

@@ -50,7 +50,7 @@ deviceRouter.get('/nodemcu', async (req, res) => {
     }
 });
 
-const data;
+let data;
 
 deviceRouter.post('/receivePostData', async (req, res) => {
     try {

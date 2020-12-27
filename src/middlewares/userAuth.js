@@ -5,7 +5,7 @@ import {User} from '../models/user.js';
 
 config();
 
-export const auth = async (req,res,next)=>{
+export const userAuth = async (req,res,next)=>{
     try{
      const token=req.header('Authorization').replace('Bearer ','');
      const decode=jwt.verify(token,process.env.SECRET_KEY);

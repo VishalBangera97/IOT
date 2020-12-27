@@ -1,8 +1,7 @@
 import express from 'express';
 import request from 'request';
-import { auth } from '../middlewares/auth.js';
+import { userAuth } from '../middlewares/userAuth.js';
 import { User} from '../models/user.js';
-import {Device} from '../models/device.js';
 
 export const userRouter = express.Router();
 
@@ -27,7 +26,7 @@ userRouter.post('/users/login', async (req, res) => {
     }
 });
 
-userRouter.patch('/users/logout', auth, async (req, res) => {
+userRouter.patch('/users/logout', userAuth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.token;
@@ -39,7 +38,7 @@ userRouter.patch('/users/logout', auth, async (req, res) => {
     }
 });
 
-userRouter.patch('/users/logoutall', auth, async (req, res) => {
+userRouter.patch('/users/logoutall', userAuth, async (req, res) => {
     try {
         req.user.tokens = undefined;
         await req.user.save();

@@ -1,22 +1,23 @@
 import express from 'express';
-import { auth } from '../middlewares/auth.js'
+import { userAuth } from '../middlewares/userAuth.js'
 import { Device } from '../models/device.js';
+import fs from 'fs'
+import { adminAuth } from '../middlewares/adminAuth.js';
 
 
 export const deviceRouter = express.Router();
 
-deviceRouter.post('/devices', async (req, res) => {
+deviceRouter.post('/devices', adminAuth, async (req, res) => {
     try {
         const device = new Device(req.body);
-        device.userId = req.query.userId;
         await device.save();
-        res.status(201).send();
+        res.status(201).send(device);
     } catch (e) {
         res.status(400).send();
     }
 });
 
-deviceRouter.patch('/bulb', auth, async (req, res) => {
+deviceRouter.patch('/bulb', userAuth, async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.user._id });
         device.bulb = req.query.status;
@@ -32,13 +33,16 @@ deviceRouter.patch('/bulb', auth, async (req, res) => {
 deviceRouter.get('/bulb', async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.query.userId });
-        res.set('Content-Type', 'text/plain');// set the headers 
-        res.send({ bulbStatus: device.bulb });// if led is on or true, send bulbStatus=true
+        res.set('Content-Type', 'text/plain');
+        res.send({ bulbStatus: device.bulb });
     } catch (e) {
         res.status(500).send();
     }
 });
 
+
+
+// experimentals
 deviceRouter.get('/nodemcu', async (req, res) => {
     try {
         let host = req.query.host;
@@ -55,16 +59,8 @@ let data;
 deviceRouter.post('/receivePostData', async (req, res) => {
     try {
         data = req.body.value;
-        res.send(req.body.value);
-    } catch (e) {
-        res.status(501).send();
-    }
-});
-
-deviceRouter.put('/receivePutData', async (req, res) => {
-    try {
-        data = req.query.data;
-        res.send(req.query.data);
+        fs.appendFile('data.txt', data);
+        res.send('Server received the value : ' + data);
     } catch (e) {
         res.status(501).send();
     }

@@ -12,11 +12,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    deviceId: {
-        type: String,
-        required: true,
-        trim: true
-    },
     email: {
         type: String,
         required: true,
@@ -49,10 +44,10 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-userSchema.virtual('devices',{
-    ref:'Device',
-    localField:'_id',
-    foreignField:'userId'
+userSchema.virtual('devices', {
+    ref: 'Device',
+    localField: '_id',
+    foreignField: 'userId'
 })
 
 userSchema.methods.generateAuthToken = async function () {

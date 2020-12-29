@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 
 export const userRouter = express.Router();
 const event = new EventEmitter();
+var otp = 0;
 
 userRouter.post('/users', async (req, res) => {
     try {
@@ -18,6 +19,17 @@ userRouter.post('/users', async (req, res) => {
         res.status(400).send(e);
     }
 });
+
+userRouter.get('/users/validate', async (req, res) => {
+    try {
+        const email = req.query.email;
+        otp = Math.floor(100000 + Math.random() * 900000); //generating 6 digit otp
+        event.emit('verifyUser', email, otp); //event to send mail for otp validation
+        res.send({ otp });
+    } catch (e) {
+        res.status(401).send(e);
+    }
+})
 
 userRouter.post('/users/login', async (req, res) => {
     try {
@@ -52,8 +64,14 @@ userRouter.patch('/users/logoutall', userAuth, async (req, res) => {
 });
 
 
+//mail events
+
 event.on('addUser', (user) => {
-    sendMail(user.email, 'Welcome to Team IOTNO', 'Thank you for choosing us and we will strive to do better');
+    sendMail(user.email, 'Welcome to IOTNO', 'Thank you for choosing us and we will strive to do better');
+});
+
+event.on('verifyUser', (email, otp) => {
+    sendMail(email, 'IOTNO OTP Verification', 'OTP for IOTNO is ' + otp + '. Please enter this in the app registration page. Please do not share this otp number with anyone');
 });
 
 

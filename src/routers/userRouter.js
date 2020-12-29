@@ -1,14 +1,17 @@
 import express from 'express';
-import request from 'request';
 import { userAuth } from '../middlewares/userAuth.js';
-import { User} from '../models/user.js';
+import { User } from '../models/user.js';
+import { sendMail } from '../mails/mail.js';
+import { EventEmitter } from 'events';
 
 export const userRouter = express.Router();
+const event = new EventEmitter();
 
 userRouter.post('/users', async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
+        event.emit('addUser', user);
         let token = await user.generateAuthToken();
         res.status(201).send({ user, token });
     } catch (e) {
@@ -47,4 +50,11 @@ userRouter.patch('/users/logoutall', userAuth, async (req, res) => {
         res.status(500).send();
     }
 });
+
+
+event.on('addUser', (user) => {
+    sendMail(user.email, 'Welcome to Team IOTNO', 'Thank you for choosing us and we will strive to do better');
+});
+
+
 

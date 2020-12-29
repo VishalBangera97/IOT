@@ -25,6 +25,10 @@ userRouter.get('/users/validate', async (req, res) => {
         const email = req.query.email;
         otp = Math.floor(100000 + Math.random() * 900000); //generating 6 digit otp
         event.emit('verifyUser', email, otp); //event to send mail for otp validation
+        let user=await User.findOne({email});
+        if(user){
+            throw new Error('Email already exist');
+        }
         res.send({ otp });
     } catch (e) {
         res.status(401).send(e);
@@ -45,7 +49,7 @@ userRouter.patch('/users/logout', userAuth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.token;
-        })
+        });
         await req.user.save();
         res.send();
     } catch (e) {

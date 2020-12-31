@@ -31,7 +31,7 @@ export const plotGraph = async (text,type, data) => {
     return new Promise((resolve, reject) => {
         chartExporter.export(chartDetails, async (err, res) => {
             if (err) {
-                reject('Error generating buffer for graph');
+                reject(err);
             }
             // Get the image data (base64)
             let imageb64 = res.data;

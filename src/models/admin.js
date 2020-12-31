@@ -39,6 +39,7 @@ const adminSchema = new mongoose.Schema({
     ]
 });
 
+
 adminSchema.statics.findByCredentials = async function ({ email, password }) {
     const admin = await Admin.findOne({ email });
     if (!admin) {

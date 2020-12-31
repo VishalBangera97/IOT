@@ -6,7 +6,12 @@ import { deviceRouter } from './src/routers/deviceRouter.js';
 import { adminRouter } from './src/routers/adminRouter.js';
 
 mongoDb();
+
 export const app = express();
+app.get('/getname',async(req,res)=>{
+    res.send('My Name');
+})
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -14,6 +19,10 @@ app.use(cors());
 app.use(userRouter);
 app.use(deviceRouter);
 app.use(adminRouter);
+
+
+
+
 
 
 

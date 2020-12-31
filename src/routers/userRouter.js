@@ -4,6 +4,7 @@ import { User } from '../models/user.js';
 import { sendMail } from '../mails/mail.js';
 import { EventEmitter } from 'events';
 
+
 export const userRouter = express.Router();
 const event = new EventEmitter();
 var otp = 0;
@@ -25,8 +26,8 @@ userRouter.get('/users/validate', async (req, res) => {
         const email = req.query.email;
         otp = Math.floor(100000 + Math.random() * 900000); //generating 6 digit otp
         event.emit('verifyUser', email, otp); //event to send mail for otp validation
-        let user=await User.findOne({email});
-        if(user){
+        let user = await User.findOne({ email });
+        if (user) {
             throw new Error('Email already exist');
         }
         res.send({ otp });
@@ -69,7 +70,6 @@ userRouter.patch('/users/logoutall', userAuth, async (req, res) => {
 
 
 //mail events
-
 event.on('addUser', (user) => {
     sendMail(user.email, 'Welcome to IOTNO', 'Thank you for choosing us and we will strive to do better');
 });

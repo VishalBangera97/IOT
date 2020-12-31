@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-export const sendMail = (to, subject, text) => {
+export const sendMail = (to, subject, text, attachments) => {
 
     var transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -17,7 +17,8 @@ export const sendMail = (to, subject, text) => {
         from: 'tnode2021@gmail.com',
         to,
         subject,
-        text
+        text,
+        attachments
     }
 
     transporter.sendMail(mailOptions, (err, res) => {

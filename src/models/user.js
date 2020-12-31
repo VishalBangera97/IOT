@@ -39,7 +39,11 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    status: {
+        type: Boolean,
+        required: true
+    }
 }, {
     timestamps: true
 });
@@ -59,7 +63,7 @@ userSchema.methods.generateAuthToken = async function () {
 }
 
 userSchema.statics.findUserByCredentials = async function ({ email, password }) {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, status: true });
     if (!user) {
         throw new Error("Invalid Credentials");
     }
@@ -76,6 +80,7 @@ userSchema.methods.toJSON = function () {
     const userObject = user.toObject();
     delete userObject.password;
     delete userObject.tokens;
+    delete userObject.status;
     return userObject;
 }
 

@@ -94,6 +94,7 @@ deviceRouter.post('/receiveBulbData', async (req, res) => {
 deviceRouter.get('/plotGraph', userAuth, async (req, res) => {
     try {
         let device = await Device.findOne({ userId: req.user._id });
+        console.log(device.bulb.graph)
         let result = await plotGraph('Bulb Graph', 'line', device.bulb.graph);
         res.set('Content-Type', 'image/png');
         let attachments = [{

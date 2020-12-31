@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { Admin } from '../models/admin.js';
 import { User } from '../models/user.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
-import {sendMail} from '../mails/mail.js';
+import { sendMail } from '../mails/mail.js';
 
 export const adminRouter = express.Router();
 const event = new EventEmitter();
@@ -13,10 +13,9 @@ adminRouter.post('/admin', async (req, res) => {
         let admin = new Admin(req.body);
         await admin.save();
         let token = await admin.getAuthToken();
-        event.emit('addAdmin', admin);        
+        event.emit('addAdmin', admin);
         res.status(201).send({ admin, token });
     } catch (e) {
-        console.log(e)
         res.status(400).send(e);
     }
 });
@@ -44,15 +43,14 @@ adminRouter.patch('/admin/logout', adminAuth, async (req, res) => {
     }
 });
 
-//GET/admin/users?completed:true or false
+//GET/admin/users?status:true or false
 //GET/admin/users?limit=10&skip=0
 //GET/admin/users?sortyBy=createdAt:asc
 adminRouter.get('/admin/users', adminAuth, async (req, res) => {
     try {
-        const users = await User.find().skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit)).sort({ createdAt: req.query.sortBy });
+        const users = await User.find({ status:req.query.status }).skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit)).sort({ createdAt: req.query.sortBy });
         res.send(users);
     } catch (e) {
-        console.log(e)
         res.status(500).send(e);
     }
 });

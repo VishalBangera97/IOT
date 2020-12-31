@@ -13,7 +13,7 @@ export const mongoDb = () => {
 var db=mongoose.connection;
 
 db.on('error',()=>{
-    console.log('Something went wrong');
+    throw new Error('Something went Wrong in Database');
 });
 
 db.on('open',()=>{

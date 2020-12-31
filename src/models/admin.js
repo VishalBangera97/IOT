@@ -61,7 +61,7 @@ adminSchema.methods.getAuthToken = async function () {
     return token;
 }
 
-adminSchema.methods.toJSON = async function () {
+adminSchema.methods.toJSON = function () {
     let admin = this;
     const adminObject = admin.toObject();
     delete adminObject.password;

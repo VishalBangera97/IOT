@@ -15,7 +15,6 @@ deviceRouter.post('/devices', adminAuth, async (req, res) => {
         await device.save();
         res.status(201).send(device);
     } catch (e) {
-        console.log(e);
         res.status(400).send(e);
     }
 });
@@ -24,10 +23,10 @@ deviceRouter.post('/devices', adminAuth, async (req, res) => {
 deviceRouter.patch('/bulb', userAuth, async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.user._id });
-        device.bulb = req.query.status;
+        device.bulb.status = req.query.status;
         await device.save();
         res.set('Content-Type', 'text/plain');
-        res.send({ value: device.bulb });
+        res.send({ value: device.bulb.status });
 
     } catch (e) {
         res.status(500).send();
@@ -52,7 +51,6 @@ deviceRouter.get('/nodemcu', async (req, res) => {
     try {
         let host = req.query.host;
         let url = "/data";
-        console.log('here')
         res.redirect(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: close\r\n\r\n");
     } catch (e) {
         res.status(501).send(e);
@@ -85,7 +83,6 @@ deviceRouter.post('/receiveBulbData', async (req, res) => {
         await device.save();
         res.send('Server received the value : ' + data);
     } catch (e) {
-        console.log(e);
         res.status(500).send(e);
     }
 });
@@ -94,7 +91,6 @@ deviceRouter.post('/receiveBulbData', async (req, res) => {
 deviceRouter.get('/plotGraph', userAuth, async (req, res) => {
     try {
         let device = await Device.findOne({ userId: req.user._id });
-        console.log(device.bulb.graph)
         let result = await plotGraph('Bulb Graph', 'line', device.bulb.graph);
         res.set('Content-Type', 'image/png');
         let attachments = [{
@@ -105,7 +101,6 @@ deviceRouter.get('/plotGraph', userAuth, async (req, res) => {
         sendMail(req.user.email, 'Report of Data', 'This report has data of last 10 values', attachments);
         res.send(result);
     } catch (e) {
-        console.log(e)
         res.status(500).send(e);
     }
 });

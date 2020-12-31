@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data"
+    "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data",
+    "preinstall": "export ACCEPT_HIGHCHARTS_LICENSE=1"
   },
   "keywords": [],
   "author": "",

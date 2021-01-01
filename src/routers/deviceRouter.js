@@ -38,7 +38,7 @@ deviceRouter.get('/bulb', async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.query.userId });
         res.set('Content-Type', 'text/plain');
-        res.send({ bulbStatus: device.bulb });
+        res.send({ bulbStatus: device.bulb.status });
     } catch (e) {
         res.status(500).send();
     }
@@ -92,6 +92,9 @@ deviceRouter.get('/plotGraph', userAuth, async (req, res) => {
     try {
         let device = await Device.findOne({ userId: req.user._id });
         let result = await plotGraph('Bulb Graph', 'line', device.bulb.graph);
+        if(!result){
+            throw new Error('No graph to plot');
+        }
         res.set('Content-Type', 'image/png');
         let attachments = [{
             filename: 'graph.png',

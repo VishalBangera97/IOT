@@ -9,6 +9,8 @@ export const userRouter = express.Router();
 const event = new EventEmitter();
 var otp = 0;
 
+//POST: /users
+//add a new User
 userRouter.post('/users', async (req, res) => {
     try {
         const user = new User(req.body);
@@ -21,7 +23,9 @@ userRouter.post('/users', async (req, res) => {
     }
 });
 
-userRouter.get('/users/validate', async (req, res) => {
+//GET: /users/me/validate?email=''
+//Generate and get otp for user validation
+userRouter.get('/users/me/validate', async (req, res) => {
     try {
         const email = req.query.email;
         otp = Math.floor(100000 + Math.random() * 900000); //generating 6 digit otp
@@ -34,9 +38,26 @@ userRouter.get('/users/validate', async (req, res) => {
     } catch (e) {
         res.status(401).send(e);
     }
-})
+});
 
-userRouter.post('/users/login', async (req, res) => {
+//GET: users/me?userId=''
+//get user from user Id
+userRouter.get('users/me', async (req, res) => {
+    try {
+        let user = await User.findById(req.query.userId);
+        if (!user) {
+            throw new Error('User Not Found');
+        }
+        res.send({user});
+    } catch (e) {
+        res.status(404).send(e);
+    }
+});
+
+
+//POST:/users/me/login
+//login user using email and password
+userRouter.post('/users/me/login', async (req, res) => {
     try {
         const user = await User.findUserByCredentials(req.body);
         let token = await user.generateAuthToken();
@@ -46,7 +67,9 @@ userRouter.post('/users/login', async (req, res) => {
     }
 });
 
-userRouter.patch('/users/logout', userAuth, async (req, res) => {
+//PATCH:/users/me/logout
+//logout user
+userRouter.patch('/users/me/logout', userAuth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.token;
@@ -58,7 +81,9 @@ userRouter.patch('/users/logout', userAuth, async (req, res) => {
     }
 });
 
-userRouter.patch('/users/logoutall', userAuth, async (req, res) => {
+//PATCH:/users/me/logoutall
+//logout all users
+userRouter.patch('/users/me/logoutall', userAuth, async (req, res) => {
     try {
         req.user.tokens = undefined;
         await req.user.save();
@@ -70,10 +95,13 @@ userRouter.patch('/users/logoutall', userAuth, async (req, res) => {
 
 
 //mail events
+
+//event to send mail when a new user registers
 event.on('addUser', (user) => {
     sendMail(user.email, 'Welcome to IOTNO', 'Thank you for choosing us and we will strive to do better');
 });
 
+//event to send mail to user to validate otp
 event.on('verifyUser', (email, otp) => {
     sendMail(email, 'IOTNO OTP Verification', 'OTP for IOTNO is ' + otp + '. Please enter this in the app registration page. Please do not share this otp number with anyone');
 });

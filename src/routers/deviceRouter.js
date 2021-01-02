@@ -4,14 +4,22 @@ import { Device } from '../models/device.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
 import { plotGraph } from '../graphs/graph.js';
 import { sendMail } from '../mails/mail.js';
+import { User } from '../models/user.js';
 
 
 export const deviceRouter = express.Router();
 
-//adding new device to a new user
+//POST/devices
+//approving registered user and adding device
 deviceRouter.post('/devices', adminAuth, async (req, res) => {
     try {
-        const device = new Device(req.body);
+        let user = await User.findById(req.body.userId);
+        user.status = 'active'; //approving user
+        if (!user) {
+            throw new Error('Invalid User Id');
+        }
+        await user.save();
+        let device = new Device(req.body); //adding new devices for the given user
         await device.save();
         res.status(201).send(device);
     } catch (e) {
@@ -19,8 +27,9 @@ deviceRouter.post('/devices', adminAuth, async (req, res) => {
     }
 });
 
-// on and off the device from user
-deviceRouter.patch('/bulb', userAuth, async (req, res) => {
+//PATCH/bulb?status=on
+// on and off the bulb from user
+deviceRouter.patch('/devices/bulb', userAuth, async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.user._id });
         device.bulb.status = req.query.status;
@@ -29,12 +38,29 @@ deviceRouter.patch('/bulb', userAuth, async (req, res) => {
         res.send({ value: device.bulb.status });
 
     } catch (e) {
+        res.status(500).send(e);
+    }
+});
+
+//PATCH/devices/motor?status=on
+//on and off the motor from user
+deviceRouter.patch('/devices/motor', userAuth, async (req, res) => {
+    try {
+        let device = await Device.findOne({ userId: req.user._id });
+        if (!device) {
+            throw new Error('No Device Found');
+        }
+        device.motor.status = req.query.status;
+        await device.save();
+        res.send({ value: device.motor.status });
+    } catch (e) {
         res.status(500).send();
     }
 });
 
+//GET/bulb?userId=as55
 //get device status for node mcu
-deviceRouter.get('/bulb', async (req, res) => {
+deviceRouter.get('/devices/bulb', async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.query.userId });
         res.set('Content-Type', 'text/plain');
@@ -45,9 +71,10 @@ deviceRouter.get('/bulb', async (req, res) => {
 });
 
 
-
 // experimentals
-deviceRouter.get('/nodemcu', async (req, res) => {
+
+
+deviceRouter.get('/devices/nodemcu', async (req, res) => {
     try {
         let host = req.query.host;
         let url = "/data";
@@ -57,7 +84,10 @@ deviceRouter.get('/nodemcu', async (req, res) => {
     }
 });
 
-deviceRouter.post('/receiveBulbData', async (req, res) => {
+
+//POST/devices/receiveBulbData?userId=''
+//method to receive bulb data from nodemcu
+deviceRouter.post('/devices/receiveBulbData', async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.query.userId });
         let x = device.bulb.x;
@@ -87,12 +117,13 @@ deviceRouter.post('/receiveBulbData', async (req, res) => {
     }
 });
 
-
-deviceRouter.get('/plotGraph', userAuth, async (req, res) => {
+//GET/devices/bulb/plotGraph
+//method to plot graph of bulb data
+deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
     try {
         let device = await Device.findOne({ userId: req.user._id });
         let result = await plotGraph('Bulb Graph', 'line', device.bulb.graph);
-        if(!result){
+        if (!result) {
             throw new Error('No graph to plot');
         }
         res.set('Content-Type', 'image/png');

@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
         }
     }],
     status: {
-        type: Boolean,
+        type: String,
         required: true
     }
 }, {
@@ -53,7 +53,7 @@ userSchema.virtual('devices', {
     ref: 'Device',
     localField: '_id',
     foreignField: 'userId'
-})
+});
 
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
@@ -64,7 +64,7 @@ userSchema.methods.generateAuthToken = async function () {
 }
 
 userSchema.statics.findUserByCredentials = async function ({ email, password }) {
-    const user = await User.findOne({ email, status: true });
+    const user = await User.findOne({ email, status: 'active' });
     if (!user) {
         throw new Error("Invalid Credentials");
     }
@@ -81,7 +81,6 @@ userSchema.methods.toJSON = function () {
     const userObject = user.toObject();
     delete userObject.password;
     delete userObject.tokens;
-    delete userObject.status;
     return userObject;
 }
 

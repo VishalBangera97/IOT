@@ -1,4 +1,5 @@
 import chartExporter from 'highcharts-export-server';
+import fs from 'fs';
 
 export const plotGraph = async (text: string, type: string, data: { x: number, y: number }[]) => {
     chartExporter.initPool();
@@ -33,10 +34,14 @@ export const plotGraph = async (text: string, type: string, data: { x: number, y
             if (err) {
                 reject(err);
             }
-            // Get the image data (base64)
+            let outputFile = "bar.png";
             let imageb64 = res.data;
+
+            fs.writeFileSync(outputFile, imageb64, "base64");
+            resolve('');
+            // Get the image data (base64)
             //resolve(new Buffer.from(imageb64, 'base64'));
-            resolve(Buffer.from(imageb64, 'base64'));
+            //resolve(Buffer.from(imageb64, 'base64'));
             chartExporter.killPool();
         });
     });

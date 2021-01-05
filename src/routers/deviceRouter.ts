@@ -143,10 +143,10 @@ deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
             throw new Error();
         }
         let result = await plotGraph('Bulb Graph', 'line', device.bulb.graph);
-        if (!result) {
-            console.timeEnd('time');
-            throw new Error('No graph to plot');
-        }
+        // if (!result) {
+        //     console.timeEnd('time');
+        //     throw new Error('No graph to plot');
+        // }
         res.set('Content-Type', 'image/png');
         let attachments = [{
             filename: 'graph.png',
@@ -154,7 +154,10 @@ deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
             contentType: 'image/png'
         }]
         //sendMail(req.user.email, 'Report of Data', 'This report has data of last 10 values', attachments);
-        res.send(result);
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        console.log(path.resolve(__dirname , '../../../bar.png'))
+        res.sendFile(path.resolve(__dirname , '../../../bar.png'));
     } catch (e) {
         console.log(e)
         res.status(500).send(e);

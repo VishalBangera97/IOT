@@ -8,7 +8,8 @@
     "dev": "tsc & nodemon build/index.js -e ts",
     "start": "tsc & node build/index.js",
     "tsc": "tsc",
-    "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data"
+    "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data",
+    "postinstall": "tsc"
   },
   "keywords": [],
   "author": "",

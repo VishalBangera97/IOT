@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsc & nodemon build/index.js -e ts",
-    "start": "tsc & node build/index.js",
+    "dev": "tsc & node build/index.js -e ts",
+    "start": "node build/index.js",
     "tsc": "tsc",
     "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data",
     "postinstall": "tsc"

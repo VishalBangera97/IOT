@@ -5,7 +5,6 @@ import { workerData, parentPort, isMainThread } from 'worker_threads';
 //export const plotGraph = async (text,type, data) => {
 let { type, text, data } = workerData;
 chartExporter.initPool();
-console.log(isMainThread)
 // Chart details object specifies chart type and data to plot
 const chartDetails = {
     type: "png",
@@ -33,12 +32,12 @@ const chartDetails = {
 };
 
 
-chartExporter.export(chartDetails, async (err, res) => {
+chartExporter.export(chartDetails, async (err: Error, res: any) => {
     if (err) {
-        reject(err);
+        throw new Error();
     }
     // Get the image data (base64)
     let imageb64 = res.data;
-    parentPort.postMessage(new Buffer.from(imageb64, 'base64'));
+    parentPort!.postMessage(Buffer.from(imageb64, 'base64'));
 });
 

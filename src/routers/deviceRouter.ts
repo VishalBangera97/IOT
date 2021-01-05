@@ -5,6 +5,8 @@ import { adminAuth } from '../middlewares/adminAuth.js';
 import { userAuth } from '../middlewares/userAuth.js';
 import { Device } from '../models/device.js';
 import { User } from '../models/user.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 
 export const deviceRouter = express.Router();
@@ -102,6 +104,7 @@ deviceRouter.post('/devices/receiveBulbData', async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.query.userId as string });
         if (!device) {
+
             throw new Error();
         }
         let x = device.bulb.x;
@@ -165,8 +168,13 @@ deviceRouter.get('/devices/bulb/plotGraphs', userAuth, async (req, res) => {
         if (!device) {
             throw new Error();
         }
-        let worker = new Worker('H:/IOT/src/graphs/graph1.js', { workerData: { text: 'Bulb Graph', type: 'line', data: device.bulb.graph } })
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        let worker = new Worker(path.resolve(__dirname, '../graphs/graph1.js'), { workerData: { text: 'Bulb Graph', type: 'line', data: device.bulb.graph } })
         let result;
+        worker.on('error', (e) => {
+            console.log(e);
+        })
         worker.on('message', (message) => {
             result = Buffer.from(new Uint8Array(message));
             if (!result) {

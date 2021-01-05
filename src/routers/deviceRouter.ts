@@ -142,22 +142,7 @@ deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
         if (!device) {
             throw new Error();
         }
-        await plotGraph('Bulb Graph', 'line', device.bulb.graph,req.user.email);
-        // if (!result) {
-        //     console.timeEnd('time');
-        //     throw new Error('No graph to plot');
-        // }
-        // res.set('Content-Type', 'image/png');
-        // let attachments = [{
-        //     filename: 'graph.png',
-        //     content: result,
-        //     contentType: 'image/png'
-        // }]
-        //sendMail(req.user.email, 'Report of Data', 'This report has data of last 10 values', attachments);
-        // const __filename = fileURLToPath(import.meta.url);
-        // const __dirname = path.dirname(__filename);
-        // console.log(path.resolve(__dirname, '../../../bar.png'))
-        // res.sendFile(path.resolve(__dirname, '../../../bar.png'));
+        await plotGraph('Bulb Graph', 'line', device.bulb.graph, req.user.email);
         res.send();
     } catch (e) {
         console.log(e)

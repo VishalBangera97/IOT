@@ -9,8 +9,7 @@
     "start": "node build/index.js",
     "tsc": "tsc",
     "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data",
-    "build": "tsc",
-    "heroku-postbuild":"npm run build"
+    "heroku-postbuild":"tsc"
   },
   "keywords": [],
   "author": "",

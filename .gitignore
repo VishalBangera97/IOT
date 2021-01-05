@@ -1,6 +1,5 @@
 .env
 node_modules
-build
 playground.js
 playground3.js
 playground4.txt

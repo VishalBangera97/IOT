@@ -10,7 +10,7 @@
     "tsc": "tsc",
     "mongo": "C:/Users/DELL/mongodb/bin/mongod.exe --dbpath=C:/Users/DELL/mongodb-data",
     "build": "tsc",
-    "heroku-postbuild":"heroku run build"
+    "heroku-postbuild":"npm run build"
   },
   "keywords": [],
   "author": "",

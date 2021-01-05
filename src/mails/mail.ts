@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-export const sendMail = (to: string, subject: string, text: string, attachments: []) => {
+export const sendMail = (to: string, subject: string, text: string, attachments: any) => {
 
     var transporter = nodemailer.createTransport({
         service: 'gmail',

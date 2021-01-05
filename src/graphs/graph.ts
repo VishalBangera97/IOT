@@ -41,7 +41,7 @@ export const plotGraph = async (text: string, type: string, data: { x: number, y
                 contentType: 'image/png'
             }]
             sendMail(email, 'Report of Data', 'This report has data of last 10 values', attachments);
-            resolve('');
+            resolve(result);
             chartExporter.killPool();
         });
     });

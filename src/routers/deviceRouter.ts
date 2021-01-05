@@ -142,8 +142,9 @@ deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
         if (!device) {
             throw new Error();
         }
-        await plotGraph('Bulb Graph', 'line', device.bulb.graph, req.user.email);
-        res.send();
+        let result=await plotGraph('Bulb Graph', 'line', device.bulb.graph, req.user.email);
+        res.set('Content-Type','image/jpg');
+        res.send(result);
     } catch (e) {
         console.log(e)
         res.status(500).send(e);

@@ -29,7 +29,7 @@ export const plotGraph = async (text: string, type: string, data: { x: number, y
     };
 
     return new Promise(async (resolve, reject) => {
-        chartExporter.export(chartDetails, async (err: Error, res:any) => {
+        chartExporter.export(chartDetails, async (err: Error, res: any) => {
             if (err) {
                 reject(err);
             }
@@ -37,6 +37,7 @@ export const plotGraph = async (text: string, type: string, data: { x: number, y
             let imageb64 = res.data;
             //resolve(new Buffer.from(imageb64, 'base64'));
             resolve(Buffer.from(imageb64, 'base64'));
+            chartExporter.initPool();
         });
     });
 }

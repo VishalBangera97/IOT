@@ -1,7 +1,6 @@
-import chartExporter from "highcharts-export-server";
+import chartExporter from 'highcharts-export-server';
 
-export const plotGraph = async (text,type, data) => {
-
+export const plotGraph = async (text: string, type: string, data: { x: number, y: number }[]) => {
     chartExporter.initPool();
     // Chart details object specifies chart type and data to plot
     const chartDetails = {
@@ -28,15 +27,18 @@ export const plotGraph = async (text,type, data) => {
             ]
         }
     };
-    return new Promise((resolve, reject) => {
-        chartExporter.export(chartDetails, async (err, res) => {
+
+    return new Promise(async (resolve, reject) => {
+        chartExporter.export(chartDetails, async (err: Error, res:any) => {
             if (err) {
                 reject(err);
             }
             // Get the image data (base64)
             let imageb64 = res.data;
-            resolve(new Buffer.from(imageb64, 'base64'));
+            //resolve(new Buffer.from(imageb64, 'base64'));
+            resolve(Buffer.from(imageb64, 'base64'));
         });
-
     });
 }
+
+

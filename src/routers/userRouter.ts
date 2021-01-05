@@ -27,7 +27,7 @@ userRouter.post('/users', async (req, res) => {
 //Generate and get otp for user validation
 userRouter.get('/users/me/validate', async (req, res) => {
     try {
-        const email = req.query.email;
+        const email = req.query.email as string;
         otp = Math.floor(100000 + Math.random() * 900000); //generating 6 digit otp
         event.emit('verifyUser', email, otp); //event to send mail for otp validation
         let user = await User.findOne({ email });
@@ -47,6 +47,7 @@ userRouter.get('/users/me', userAuth, async (req, res) => {
         let user = req.user;
         res.send({ user });
     } catch (e) {
+        console.log(e)
         res.status(404).send(e);
     }
 });
@@ -68,7 +69,7 @@ userRouter.post('/users/me/login', async (req, res) => {
 //logout user
 userRouter.patch('/users/me/logout', userAuth, async (req, res) => {
     try {
-        req.user.tokens = req.user.tokens.filter((token) => {
+        req.user.tokens = req.user.tokens?.filter((token: any) => {
             return token.token !== req.token;
         });
         await req.user.save();
@@ -95,12 +96,12 @@ userRouter.patch('/users/me/logoutall', userAuth, async (req, res) => {
 
 //event to send mail when a new user registers
 event.on('addUser', (user) => {
-    sendMail(user.email, 'Welcome to IOTNO', 'Thank you for choosing us and we will strive to do better');
+    sendMail(user.email, 'Welcome to IOTNO', 'Thank you for choosing us and we will strive to do better', []);
 });
 
 //event to send mail to user to validate otp
 event.on('verifyUser', (email, otp) => {
-    sendMail(email, 'IOTNO OTP Verification', 'OTP for IOTNO is ' + otp + '. Please enter this in the app registration page. Please do not share this otp number with anyone');
+    sendMail(email, 'IOTNO OTP Verification', 'OTP for IOTNO is ' + otp + '. Please enter this in the app registration page. Please do not share this otp number with anyone', []);
 });
 
 

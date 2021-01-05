@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
     bulb: {
@@ -40,4 +40,27 @@ const taskSchema = new mongoose.Schema({
 
 });
 
-export const Device = mongoose.model('Device', taskSchema);
+type IDevice = {
+    bulb: {
+        status: string,
+        graph: {
+            x: number,
+            y: number
+        }[],
+        x: number,
+    }
+    motor: {
+        status: string,
+        graph: {
+            x: number,
+            y: number
+        }[],
+        x: number,
+    }
+    userId: Types.ObjectId;
+    status: boolean
+}
+
+export interface DeviceDocument extends IDevice, mongoose.Document { }
+
+export const Device = mongoose.model<DeviceDocument>('Device', taskSchema);

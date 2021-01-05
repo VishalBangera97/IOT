@@ -1,18 +1,15 @@
-import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
-import { userRouter } from './src/routers/userRouter.js';
+import express from 'express';
 import { mongoDb } from './src/db/mongodb.js';
-import { deviceRouter } from './src/routers/deviceRouter.js';
 import { adminRouter } from './src/routers/adminRouter.js';
-
+import { deviceRouter } from './src/routers/deviceRouter.js';
+import { userRouter } from './src/routers/userRouter.js';
 mongoDb();
 
-export const app = express();
-app.get('/getname',async(req,res)=>{
-    res.send('My Name');
-})
+export const app: express.Application = express();
 
-
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());

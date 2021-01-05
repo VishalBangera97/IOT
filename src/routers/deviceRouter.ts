@@ -1,9 +1,9 @@
 import express from 'express';
-import { userAuth } from '../middlewares/userAuth.js'
-import { Device } from '../models/device.js';
-import { adminAuth } from '../middlewares/adminAuth.js';
+import { Worker } from 'worker_threads';
 import { plotGraph } from '../graphs/graph.js';
-import { sendMail } from '../mails/mail.js';
+import { adminAuth } from '../middlewares/adminAuth.js';
+import { userAuth } from '../middlewares/userAuth.js';
+import { Device } from '../models/device.js';
 import { User } from '../models/user.js';
 
 
@@ -14,10 +14,10 @@ export const deviceRouter = express.Router();
 deviceRouter.post('/devices', adminAuth, async (req, res) => {
     try {
         let user = await User.findById(req.body.userId);
-        user.status = 'active'; //approving user
         if (!user) {
             throw new Error('Invalid User Id');
         }
+        user.status = 'active'; //approving user
         await user.save();
         let device = new Device(req.body); //adding new devices for the given user
         await device.save();
@@ -32,7 +32,10 @@ deviceRouter.post('/devices', adminAuth, async (req, res) => {
 deviceRouter.patch('/devices/bulb', userAuth, async (req, res) => {
     try {
         const device = await Device.findOne({ userId: req.user._id });
-        device.bulb.status = req.query.status;
+        if (!device) {
+            throw new Error();
+        }
+        device.bulb.status = req.query.status as string;
         await device.save();
         res.set('Content-Type', 'text/plain');
         res.send({ value: device.bulb.status });
@@ -50,7 +53,7 @@ deviceRouter.patch('/devices/motor', userAuth, async (req, res) => {
         if (!device) {
             throw new Error('No Device Found');
         }
-        device.motor.status = req.query.status;
+        device.motor.status = req.query.status as string;
         await device.save();
         res.send({ value: device.motor.status });
     } catch (e) {
@@ -62,9 +65,17 @@ deviceRouter.patch('/devices/motor', userAuth, async (req, res) => {
 //get device status for node mcu
 deviceRouter.get('/devices/bulb', async (req, res) => {
     try {
-        const device = await Device.findOne({ userId: req.query.userId });
+        console.log('----------------')
+        console.log('get bulb status');
+        console.time('timeE')
+        const device = await Device.findOne({ userId: req.query.userId as string });
+        if (!device) {
+            throw new Error();
+        }
         res.set('Content-Type', 'text/plain');
         res.send({ bulbStatus: device.bulb.status });
+        console.timeEnd('timeE');
+        console.log('----------------')
     } catch (e) {
         res.status(500).send();
     }
@@ -89,7 +100,10 @@ deviceRouter.get('/devices/nodemcu', async (req, res) => {
 //method to receive bulb data from nodemcu
 deviceRouter.post('/devices/receiveBulbData', async (req, res) => {
     try {
-        const device = await Device.findOne({ userId: req.query.userId });
+        const device = await Device.findOne({ userId: req.query.userId as string });
+        if (!device) {
+            throw new Error();
+        }
         let x = device.bulb.x;
         let graph = device.bulb.graph;
         let data = req.body.value;
@@ -108,7 +122,7 @@ deviceRouter.post('/devices/receiveBulbData', async (req, res) => {
             });
             x--; // x will be 10 whenever the array size become 10. This value will be given to the next added element and that wll be decreased inside the previous loop to 9 again
         }
-        device.graph = graph;
+        device.bulb.graph = graph;
         device.bulb.x = x;
         await device.save();
         res.send('Server received the value : ' + data);
@@ -122,8 +136,12 @@ deviceRouter.post('/devices/receiveBulbData', async (req, res) => {
 deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
     try {
         let device = await Device.findOne({ userId: req.user._id });
+        if (!device) {
+            throw new Error();
+        }
         let result = await plotGraph('Bulb Graph', 'line', device.bulb.graph);
         if (!result) {
+            console.timeEnd('time');
             throw new Error('No graph to plot');
         }
         res.set('Content-Type', 'image/png');
@@ -132,9 +150,41 @@ deviceRouter.get('/devices/bulb/plotGraph', userAuth, async (req, res) => {
             content: result,
             contentType: 'image/png'
         }]
-        sendMail(req.user.email, 'Report of Data', 'This report has data of last 10 values', attachments);
+        //sendMail(req.user.email, 'Report of Data', 'This report has data of last 10 values', attachments);
         res.send(result);
     } catch (e) {
+        console.log(e)
         res.status(500).send(e);
     }
 });
+
+//exppp
+deviceRouter.get('/devices/bulb/plotGraphs', userAuth, async (req, res) => {
+    try {
+        let device = await Device.findOne({ userId: req.user._id });
+        if (!device) {
+            throw new Error();
+        }
+        let worker = new Worker('H:/IOT/src/graphs/graph1.js', { workerData: { text: 'Bulb Graph', type: 'line', data: device.bulb.graph } })
+        let result;
+        worker.on('message', (message) => {
+            result = Buffer.from(new Uint8Array(message));
+            if (!result) {
+                throw new Error('No graph to plot');
+            }
+            res.set('Content-Type', 'image/png');
+            let attachments = [{
+                filename: 'graph.png',
+                content: result,
+                contentType: 'image/png'
+            }]
+            //sendMail(req.user.email, 'Report of Data', 'This report has data of last 10 values', attachments);
+            res.send(result);
+        });
+    } catch (e) {
+        console.log(e)
+        res.status(500).send(e);
+    }
+});
+
+

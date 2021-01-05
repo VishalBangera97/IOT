@@ -38,7 +38,7 @@ adminRouter.post('/admin/login', async (req, res) => {
 //method to logout admin
 adminRouter.patch('/admin/logout', adminAuth, async (req, res) => {
     try {
-        req.admin.tokens = req.admin.tokens.filter((token) => {
+        req.admin.tokens = req.admin.tokens?.filter((token: any) => {
             return token != req.token;
         });
         await req.admin.save();
@@ -54,7 +54,7 @@ adminRouter.patch('/admin/logout', adminAuth, async (req, res) => {
 //method to get users
 adminRouter.get('/admin/users', adminAuth, async (req, res) => {
     try {
-        const users = await User.find({ status: req.query.status }).skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit)).sort({ createdAt: req.query.sortBy });
+        const users = await User.find({ status: req.query.status as string }).skip(parseInt(req.query.skip as string)).limit(parseInt(req.query.limit as string)).sort({ createdAt: req.query.sortBy });
         res.send(users);
     } catch (e) {
         res.status(500).send(e);
@@ -69,7 +69,7 @@ adminRouter.patch('/admin/users', adminAuth, async (req, res) => {
         if (!user) {
             throw new Error('No user found');
         }
-        user.status = req.query.status;
+        user.status = req.query.status as string;
         await user.save();
         res.send(user);
     } catch (e) {
@@ -80,5 +80,5 @@ adminRouter.patch('/admin/users', adminAuth, async (req, res) => {
 
 event.on('addAdmin', (admin) => {
     sendMail(admin.email, 'Welcome to Team IOTNO', 'Thank you for choosing team IOTNO. We hope you will' +
-        'work seamlessly with us to make team IOTNO more prosperous');
+        'work seamlessly with us to make team IOTNO more prosperous', []);
 });
